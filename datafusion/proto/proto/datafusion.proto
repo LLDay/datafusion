@@ -750,6 +750,7 @@ message PhysicalPlanNode {
     SortMergeJoinExecNode sort_merge_join = 34;
     MemoryScanExecNode memory_scan = 35;
     AsyncFuncExecNode async_func = 36;
+    TransformPlanExecNode transform_plan = 37;
   }
 }
 
@@ -895,6 +896,8 @@ message PhysicalExprNode {
     UnknownColumn unknown_column = 20;
 
     PhysicalHashExprNode hash_expr = 21;
+
+    PhysicalPlaceholderNode placeholder_expr = 22;
   }
 }
 
@@ -1020,6 +1023,11 @@ message PhysicalHashExprNode {
   uint64 seed2 = 4;
   uint64 seed3 = 5;
   string description = 6;
+}
+
+message PhysicalPlaceholderNode {
+  string id = 1;
+  optional datafusion_common.Field field = 2;
 }
 
 message FilterExecNode {
@@ -1438,3 +1446,17 @@ message AsyncFuncExecNode {
   repeated PhysicalExprNode async_exprs = 2;
   repeated string async_expr_names = 3;
 }
+
+message TransformPlanExecNode {
+  PhysicalPlanNode input = 1;
+  repeated TransformationRule rules = 2;
+}
+
+message TransformationRule {
+  oneof rule_type {
+    bytes extension = 1;
+    ResolvePlaceholdersRule resolve_placeholders = 2;
+  }
+}
+
+message ResolvePlaceholdersRule {}
